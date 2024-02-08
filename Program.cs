@@ -1,19 +1,20 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
-using IHost host = Host.CreateApplicationBuilder(args).Build();
-
-IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
-
-
-int keyOneValue = config.GetValue<int>("KeyOne");
-bool keyTwoValue = config.GetValue<bool>("KeyTwo");
-string? keyThreeNestedValue = config.GetValue<string>("KeyThree:Message");
+using Microsoft.Extensions.Options;
+using PdfEmailSender.Extensions.Configuration;
+using PdfEmailSender.Models;
 
 
-Console.WriteLine($"KeyOne = {keyOneValue}");
-Console.WriteLine($"KeyTwo = {keyTwoValue}");
-Console.WriteLine($"KeyThree:Message = {keyThreeNestedValue}");
+var host = CreateHostBuilder(args).Build();
+
+var mySettings = host.Services.GetRequiredService<IOptions<AppSettings>>().Value;
+
+Console.WriteLine($"Environment: {mySettings.Environment}");
+Console.WriteLine($"Prop1: {mySettings.Message}");
+Console.WriteLine($"Version: {mySettings.Version}");
 
 await host.RunAsync();
+
+static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .ConfigureApp();
